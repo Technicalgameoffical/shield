@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Documents - University of Roehampton</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* The blue color from the image */
+        .bg-roehampton-blue {
+            background-color: #001f4c;
+        }
+
+        .text-roehampton-blue {
+            color: #001f4c;
+        }
+
+        /* The blue color for the button */
+        .bg-button-blue {
+            background-color: #4c8bf5;
+        }
+
+        .hover\:bg-button-blue-dark:hover {
+            background-color: #3b73e0;
+        }
+
+        .text-button-blue {
+            color: #4c8bf5;
+        }
+
+        /* A more accurate logo from the provided URL */
+        .university-logo {
+            width: 150px;
+            height: auto;
+        }
+
+        /* Styling for the chat bubble */
+        .chat-bubble {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            font-size: 0.6rem;
+            line-height: 0.9;
+        }
+
+        .chat-bubble img {
+            width: 30px;
+            height: 30px;
+            margin-top: 4px;
+        }
+
+        /* Additional styles for the new pages and error message */
+        .hidden {
+            display: none;
+        }
+
+        .clickable {
+            cursor: pointer;
+        }
+
+        .tab-active {
+            background-color: #001f4c;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-roehampton-blue flex items-center justify-center min-h-screen relative p-4">
+
+    <!-- University Logo at the top -->
+    <div class="absolute top-8 left-1/2 -translate-x-1/2 flex items-center space-x-2">
+        <img class="university-logo" src="https://i.ibb.co/YTDJNVWC/uni-logo.png" alt="University of Roehampton Logo">
+    </div>
+
+    <!-- Login Form Container -->
+    <div id="login-container" class="bg-white p-8 sm:p-12 rounded-3xl shadow-2xl w-full max-w-sm sm:max-w-md mt-24">
+        <div class="flex flex-col items-center">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-roehampton-blue">Log in</h2>
+
+            <!-- Error message box -->
+            <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative mb-4" role="alert">
+                <span class="block sm:inline">Incorrect username or password.</span>
+            </div>
+
+            <form id="login-form" class="w-full">
+                <!-- Email Input -->
+                <div class="mb-4">
+                    <label for="email" class="block text-gray-700 font-medium mb-2">Email address</label>
+                    <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-button-blue" required>
+                </div>
+
+                <!-- Password Input -->
+                <div class="mb-6">
+                    <label for="password" class="block text-gray-700 font-medium mb-2">Password</label>
+                    <input type="password" id="password" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-button-blue" required>
+                </div>
+
+                <!-- Login Button -->
+                <button type="submit" class="w-full bg-button-blue hover:bg-button-blue-dark text-white font-bold py-3 rounded-xl transition-colors">
+                    Log in
+                </button>
+            </form>
+
+            <!-- Forgot Password Link -->
+            <a href="#" class="mt-4 text-button-blue hover:underline text-sm font-medium">Reset password</a>
+        </div>
+    </div>
+
+    <!-- The Welcome Page Container (initially hidden) -->
+    <div id="welcome-container" class="hidden bg-white p-8 sm:p-12 rounded-3xl shadow-2xl w-full max-w-sm sm:max-w-md mt-24 text-center">
+        <h2 id="welcome-heading" class="text-2xl font-semibold text-gray-800 mb-4 text-roehampton-blue"></h2>
+        <p class="text-gray-600 mb-6">You have successfully logged in.</p>
+        <div id="student-id" class="text-lg font-bold text-roehampton-blue mb-4"></div>
+        <button id="documents-button" class="inline-block bg-button-blue hover:bg-button-blue-dark text-white font-bold py-3 px-6 rounded-xl transition-colors mb-4">
+            Submitted Document Tab
+        </button>
+        <button id="logout-button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-xl transition-colors">
+            Log Out
+        </button>
+    </div>
+
+    <!-- The Submitted Documents Page Container (initially hidden) -->
+    <div id="documents-container" class="hidden bg-white rounded-3xl shadow-2xl p-6 w-full max-w-4xl mt-24">
+        <header class="flex flex-col sm:flex-row justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-roehampton-blue mb-4 sm:mb-0">Submitted Documents</h1>
+            <button id="back-button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-xl transition-colors">
+                Back
+            </button>
+        </header>
+
+        <!-- Tabs for different document types -->
+        <div class="flex space-x-2 sm:space-x-4 mb-6 justify-center sm:justify-start">
+            <button id="tab-submitted" class="px-4 py-2 text-sm font-medium rounded-xl transition-colors">
+                Submitted Documents
+            </button>
+            <button id="tab-ukvi" class="px-4 py-2 text-sm font-medium rounded-xl transition-colors">
+                UKVI
+            </button>
+            <button id="tab-home-office" class="px-4 py-2 text-sm font-medium rounded-xl transition-colors">
+                Home Office
+            </button>
+        </div>
+
+        <ul id="document-list" class="divide-y divide-gray-200">
+            <!-- Student data will be populated here by JavaScript -->
+        </ul>
+    </div>
+
+    <script>
+        // Function to change the visible page
+        function showPage(pageId) {
+            document.getElementById('login-container').classList.add('hidden');
+            document.getElementById('welcome-container').classList.add('hidden');
+            document.getElementById('documents-container').classList.add('hidden');
+            
+            document.getElementById(pageId).classList.remove('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginContainer = document.getElementById('login-container');
+            const welcomeContainer = document.getElementById('welcome-container');
+            const documentsContainer = document.getElementById('documents-container');
+            
+            const loginForm = document.getElementById('login-form');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const errorMessage = document.getElementById('error-message');
+            
+            const documentsButton = document.getElementById('documents-button');
+            const backButton = document.getElementById('back-button');
+            const logoutButton = document.getElementById('logout-button');
+            const studentIdDiv = document.getElementById('student-id');
+            const welcomeHeading = document.getElementById('welcome-heading');
+
+            const documentList = document.getElementById('document-list');
+
+            // Tab buttons
+            const tabs = {
+                submitted: document.getElementById('tab-submitted'),
+                ukvi: document.getElementById('tab-ukvi'),
+                homeOffice: document.getElementById('tab-home-office')
+            };
+
+            const studentName = "Tshering Thokar";
+            const studentId = "A00077695";
+
+            // Document Data
+            const submittedData = [
+                {
+                    id: 1,
+                    documentTitle: "Passport",
+                    processedDate: "2025-08-26",
+                    status: "Verified",
+                    isClickable: true
+                },
+                {
+                    id: 2,
+                    documentTitle: "Bank Statements",
+                    processedDate: "2025-08-26",
+                    status: "Rejected",
+                    isClickable: true
+                },
+                {
+                    id: 3,
+                    documentTitle: "SOP",
+                    processedDate: "2025-08-26",
+                    status: "Rejected",
+                    isClickable: true
+                },
+                {
+                    id: 4,
+                    documentTitle: "English Test",
+                    processedDate: "2025-08-26",
+                    status: "Verified",
+                    isClickable: true
+                },
+                {
+                    id: 5,
+                    documentTitle: "Family Relation",
+                    processedDate: "2025-08-26",
+                    status: "Rejected",
+                    isClickable: true
+                }
+            ];
+
+            const ukviData = [
+                {
+                    id: 1,
+                    documentTitle: "UKVI Application Form",
+                    processedDate: "2025-08-26",
+                    status: "Rejected",
+                    isClickable: true
+                },
+                {
+                    id: 2,
+                    documentTitle: "Biometric Appointment",
+                    processedDate: "2025-08-26",
+                    status: "Rejected",
+                    isClickable: true
+                }
+            ];
+
+            const homeOfficeData = [
+                {
+                    id: 1,
+                    documentTitle: "Visa Decision Letter",
+                    processedDate: "2025-08-26",
+                    status: "Rejected",
+                    isClickable: true
+                },
+                {
+                    id: 2,
+                    documentTitle: "BRP Collection Details",
+                    processedDate: "2025-08-26",
+                    status: "Rejected",
+                    isClickable: true
+                }
+            ];
+            
+            // Function to render the document data based on the provided array
+            function renderDocuments(data) {
+                let htmlContent = '';
+                data.forEach(document => {
+                    htmlContent += `
+                        <li class="py-4 flex items-center justify-between flex-wrap ${document.isClickable ? 'clickable' : ''}" data-doc-title="${document.documentTitle}">
+                            <div class="flex flex-col mb-2 sm:mb-0">
+                                <span class="text-lg font-medium text-gray-800">${studentName}</span>
+                                <span class="text-sm text-gray-500">${document.documentTitle}</span>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <span class="text-sm text-gray-600 hidden sm:block">Processed: ${document.processedDate}</span>
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full ${document.status === 'Verified' || document.status === 'Outstanding' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}">
+                                    ${document.status}
+                                </span>
+                            </div>
+                        </li>
+                    `;
+                });
+                documentList.innerHTML = htmlContent;
+            }
+
+            // Function to handle tab clicks
+            function handleTabClick(activeTab, data) {
+                // Remove active class from all tabs
+                Object.values(tabs).forEach(tab => tab.classList.remove('tab-active'));
+                // Add active class to the clicked tab
+                activeTab.classList.add('tab-active');
+                // Render the new data
+                renderDocuments(data);
+            }
+
+            // Event listener for the document list using event delegation
+            documentList.addEventListener('click', (e) => {
+                const clickedItem = e.target.closest('li');
+                if (clickedItem && clickedItem.dataset.docTitle) {
+                    const docTitle = clickedItem.dataset.docTitle;
+                    let message = '';
+
+                    switch(docTitle) {
+                        case 'Passport':
+                            message = 'Passport was verified.';
+                            break;
+                        case 'Bank Statements':
+                            message = 'The amount was deposited recently, and the bank statements are not clear.';
+                            break;
+                        case 'SOP':
+                            message = 'Not satisfied, the SOP is invalid.';
+                            break;
+                        case 'English Test':
+                            message = 'English Test result is outstanding.';
+                            break;
+                        case 'Family Relation':
+                            message = 'One of the student\'s family members is illegally staying in the UK. This document has been rejected.';
+                            break;
+                        case 'UKVI Application Form':
+                            message = 'The Home Office Application for CAS Letter was rejected. A visa refusal was found through immigration history and VFS records. The student was not honest about this previous refusal when asked on the CAS shield, where they responded \'No\'.';
+                            break;
+                        case 'Biometric Appointment':
+                            message = 'Biometric appointment was rejected.';
+                            break;
+                        case 'Visa Decision Letter':
+                            message = 'The Home Office Application for CAS Letter was rejected. A visa refusal was found through immigration history and VFS records. The student was not honest about this previous refusal when asked on the CAS shield, where they responded \'No\'.';
+                            break;
+                        case 'BRP Collection Details':
+                            message = 'The BRP collection was rejected.';
+                            break;
+                        default:
+                            message = 'No message available for this document.';
+                    }
+                    if (message) {
+                        const messageBox = document.createElement('div');
+                        messageBox.className = 'fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50';
+                        messageBox.innerHTML = `
+                            <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full text-center">
+                                <p class="text-lg font-semibold mb-4">${message}</p>
+                                <button onclick="this.parentElement.parentElement.remove();" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">OK</button>
+                            </div>
+                        `;
+                        document.body.appendChild(messageBox);
+                    }
+                }
+            });
+
+            // Event listeners for login and navigation
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const validEmails = ['tshering.thokar12@gmail.com', 'tsheringthokar12@gmail.com'];
+                const validPassword = '@Laxmithokar00';
+                const enteredPassword = passwordInput.value;
+                const enteredEmail = emailInput.value;
+
+                if (validEmails.includes(enteredEmail) && enteredPassword === validPassword) {
+                    showPage('welcome-container');
+                    welcomeHeading.innerHTML = `Welcome, ${studentName}!`;
+                    studentIdDiv.innerHTML = `Student ID: ${studentId}`;
+                } else {
+                    errorMessage.classList.remove('hidden');
+                }
+            });
+
+            documentsButton.addEventListener('click', () => {
+                showPage('documents-container');
+                handleTabClick(tabs.submitted, submittedData);
+            });
+
+            backButton.addEventListener('click', () => {
+                showPage('welcome-container');
+            });
+            
+            logoutButton.addEventListener('click', () => {
+                showPage('login-container');
+                emailInput.value = '';
+                passwordInput.value = '';
+                errorMessage.classList.add('hidden');
+            });
+
+            // Tab event listeners
+            tabs.submitted.addEventListener('click', () => handleTabClick(tabs.submitted, submittedData));
+            tabs.ukvi.addEventListener('click', () => handleTabClick(tabs.ukvi, ukviData));
+            tabs.homeOffice.addEventListener('click', () => handleTabClick(tabs.homeOffice, homeOfficeData));
+            
+            showPage('login-container');
+        });
+    </script>
+</body>
+</html>
