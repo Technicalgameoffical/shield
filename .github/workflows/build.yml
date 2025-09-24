@@ -1,30 +1,20 @@
 name: Build iOS IPA
-on: [push, workflow_dispatch]
+on: [push]
 
 jobs:
   build-ipa:
     runs-on: macos-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        
-    - name: Install Cordova
+    - uses: actions/checkout@v4
+    - name: Build IPA
       run: |
-        npm install -g cordova
-        cordova create build com.technicalgame.shield ShieldApp
-        cp index.html build/www/
-        cp -r assets/ build/www/ || true
-        cd build
+        sudo npm install -g cordova
+        cordova create myapp com.test.app TestApp
+        cp index.html myapp/www/
+        cd myapp
         cordova platform add ios
-        cordova build ios --device
-        
-    - name: Upload IPA
-      uses: actions/upload-artifact@v4
+        cordova build ios
+    - uses: actions/upload-artifact@v4
       with:
-        name: shield-ipa
-        path: build/platforms/ios/build/device/*.ipa
+        name: ipa-file
+        path: myapp/platforms/ios/build/device/*.ipa
